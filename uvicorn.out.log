@@ -1,0 +1,9 @@
+INFO:     127.0.0.1:63933 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51333 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51333 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51107 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54758 - "GET /demo/review/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59967 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64380 - "GET /demo/review/1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64380 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51278 - "GET /redoc HTTP/1.1" 200 OK

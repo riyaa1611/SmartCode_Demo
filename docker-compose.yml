@@ -1,0 +1,35 @@
+services:
+  smartcode-app:
+    build: .
+    ports:
+      - "8084:8084"
+    environment:
+      - DATABASE_URL=postgresql://user:password@smartcode-db:5432/smart_review
+      - REDIS_URL=redis://smartcode-redis:6379/0
+    depends_on:
+      - smartcode-db
+      - smartcode-redis
+    env_file:
+      - .env
+
+  smartcode-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: smart_review
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  smartcode-redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+  redis_data:

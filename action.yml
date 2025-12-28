@@ -1,0 +1,22 @@
+name: 'Smart Code Review Action'
+description: 'AI-powered code review that validates PRs against requirements'
+author: 'Smart Code Review Bot'
+
+inputs:
+  github-token:
+    description: 'GitHub token for authentication'
+    required: true
+  api-endpoint:
+    description: 'Endpoint for the Smart Review API'
+    required: true
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
+  args:
+    - ${{ inputs.github-token }}
+    - ${{ inputs.api-endpoint }}
+
+branding:
+  icon: 'code'
+  color: 'blue'

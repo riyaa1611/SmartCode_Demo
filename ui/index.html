@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Smart Code Review UI (placeholder)</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial,Helvetica,sans-serif;max-width:960px;margin:40px auto;padding:0 16px}
+    header{display:flex;align-items:center;gap:12px}
+    .badge{background:#0b5fff;color:#fff;padding:6px 10px;border-radius:8px;font-weight:700}
+    main{margin-top:20px}
+    .placeholder{border:2px dashed #e2e8f0;padding:24px;border-radius:8px;color:#475569;background:#fbfcfe}
+    pre{background:#0f172a;color:#fff;padding:12px;border-radius:6px;overflow:auto}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge">Smart Code Review</div>
+    <h1>UI Placeholder</h1>
+  </header>
+  <main>
+    <p>This is a placeholder file for the web UI. Replace the contents below with your UI code (plain HTML, React, Svelte, etc.).</p>
+
+    <div class="placeholder">
+      <!-- Insert your UI code here. Example root for SPA apps: -->
+      <div id="app-root">Your app will mount here.</div>
+      <p style="margin-top:12px;font-size:0.9rem;color:#64748b">API base: <code>/api</code></p>
+    </div>
+
+    <h3 style="margin-top:20px">Quick examples</h3>
+    <pre>
+// Fetch health endpoint
+fetch('/health').then(r=>r.json()).then(console.log)
+    </pre>
+  </main>
+
+  <script>
+    // Optional: simple health check on load
+    async function checkHealth(){
+      try{
+        const r = await fetch('/health');
+        const j = await r.json();
+        console.log('health', j);
+      }catch(e){
+        console.warn('health check failed', e);
+      }
+    }
+    window.addEventListener('load', checkHealth);
+  </script>
+</body>
+</html>

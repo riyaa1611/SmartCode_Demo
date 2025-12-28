@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Local env files
+.env
+dev.db
+
+# Editor files
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Byte-compiled / optimized / DLL files
+*.pyc
+*.pyd
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
