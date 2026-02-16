@@ -55,7 +55,11 @@ async def demo_review(pr_id: int):
             "pr_url": "https://github.com/example/repo/pull/123",
             "status": "completed",
             "created_at": "2025-11-24T00:00:00Z",
-            "completed_at": "2025-11-24T00:05:00Z"
+            "completed_at": "2025-11-24T00:05:00Z",
+            "summary": "This is a demo review summary.",
+            "share_token": None,
+            "share_password": None,
+            "share_expires_at": None
         },
         "findings": [
             {
@@ -65,7 +69,9 @@ async def demo_review(pr_id: int):
                 "description": "Feature implementation missing for requirement X",
                 "file_path": "src/module.py",
                 "line_number": 42,
-                "confidence_score": 0.86
+                "confidence_score": 0.86,
+                "code_snippet": "def feature_x():\n    pass",
+                "suggestion": "Implement the feature logic here."
             },
             {
                 "id": 2,
@@ -74,7 +80,9 @@ async def demo_review(pr_id: int):
                 "description": "Potential SQL injection vulnerability",
                 "file_path": "src/db.py",
                 "line_number": 88,
-                "confidence_score": 0.93
+                "confidence_score": 0.93,
+                "code_snippet": "query = 'SELECT * FROM users WHERE name = ' + user_input",
+                "suggestion": "Use parameterized queries to prevent SQL injection."
             }
         ]
     }

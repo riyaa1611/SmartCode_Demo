@@ -33,10 +33,10 @@ def test_imports():
         print(f"✗ Failed to import Celery: {e}")
         
     try:
-        import anthropic
-        print("✓ Anthropic imported successfully")
+        import openai
+        print("✓ OpenAI imported successfully")
     except ImportError as e:
-        print(f"✗ Failed to import Anthropic: {e}")
+        print(f"✗ Failed to import OpenAI: {e}")
         
     try:
         import redis

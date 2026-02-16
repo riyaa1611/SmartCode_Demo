@@ -195,7 +195,7 @@ React/Vanilla implementation — I can add it next.
 
 - **Backend**: Python 3.11+, FastAPI, Celery
 - **Database**: PostgreSQL 15+
-- **LLM**: Anthropic Claude API
+- **LLM**: OpenRouter (DeepSeek R1)
 - **GitHub**: PyGithub library
 - **Static Analysis**: tree-sitter, semgrep
 - **Frontend**: React 18+, Recharts

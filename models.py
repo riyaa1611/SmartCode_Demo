@@ -31,6 +31,10 @@ class Review(Base):
     status = Column(String, default="pending")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
+    summary = Column(Text, nullable=True)
+    share_token = Column(String, nullable=True, index=True)
+    share_password = Column(String, nullable=True)
+    share_expires_at = Column(DateTime(timezone=True), nullable=True)
 
 
 class Finding(Base):
@@ -44,6 +48,8 @@ class Finding(Base):
     file_path = Column(String)
     line_number = Column(Integer)
     confidence_score = Column(Float)
+    code_snippet = Column(Text, nullable=True)
+    suggestion = Column(Text, nullable=True)
 
 
 class ContextCache(Base):

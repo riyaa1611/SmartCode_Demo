@@ -1,5 +1,8 @@
 import os
 from typing import Optional
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Settings:
@@ -22,8 +25,9 @@ class Settings:
         "sqlite:///./dev.db"
     )
 
-    # Anthropic API settings
-    anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
+    # OpenRouter API settings
+    openrouter_api_key: str = os.getenv("OPENROUTER_API_KEY", "")
+    llm_model: str = os.getenv("LLM_MODEL", "deepseek/deepseek-r1")
 
     # Redis settings for Celery (Docker mapped port)
     redis_url: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")

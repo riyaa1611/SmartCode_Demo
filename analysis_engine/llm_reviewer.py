@@ -1,12 +1,16 @@
-import anthropic
+import openai
 from config import settings
 import json
 
 class LLMReviewer:
-    """LLM-powered code reviewer using Anthropic Claude API"""
+    """LLM-powered code reviewer using OpenRouter (OpenAI-compatible API)"""
     
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+        self.client = openai.OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=settings.openrouter_api_key,
+        )
+        self.model = settings.llm_model
         
     def review_feature_completeness(self, issue_requirements: dict, code_diff: str, readme_summary: str, issue_num: int) -> dict:
         """Review if code changes fully implement requirements"""
@@ -38,23 +42,33 @@ Respond in JSON:
 }}
 """
         
-        response = self.client.messages.create(
-            model="claude-3-sonnet-20240229",
-            max_tokens=2000,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
         try:
-            result = json.loads(response.content[0].text)
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1, # Low temperature for consistent JSON
+                response_format={"type": "json_object"} # Force JSON if supported, otherwise prompt handles it
+            )
+            
+            content = response.choices[0].message.content
+            # Handle potential markdown fencing
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+                
+            result = json.loads(content)
             return result
-        except:
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print(f"LLM Error: {e}")
             return {
                 "completeness_score": 50,
                 "missing_features": [],
                 "scope_creep": [],
                 "unhandled_edge_cases": [],
-                "reasoning": "Failed to parse LLM response"
+                "reasoning": f"Failed to parse LLM response: {str(e)}"
             }
             
     def review_security(self, code_diff: str, data_flow_summary: str) -> dict:
@@ -89,17 +103,25 @@ Respond in JSON:
 }}
 """
         
-        response = self.client.messages.create(
-            model="claude-3-sonnet-20240229",
-            max_tokens=2000,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
         try:
-            result = json.loads(response.content[0].text)
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                response_format={"type": "json_object"}
+            )
+            
+            content = response.choices[0].message.content
+             # Handle potential markdown fencing
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+
+            result = json.loads(content)
             return result
-        except:
+        except Exception as e:
+            print(f"LLM Error: {e}")
             return {
                 "vulnerabilities": [],
                 "security_score": 50
@@ -134,17 +156,25 @@ Respond in JSON:
 }}
 """
         
-        response = self.client.messages.create(
-            model="claude-3-sonnet-20240229",
-            max_tokens=2000,
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        
         try:
-            result = json.loads(response.content[0].text)
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.1,
+                response_format={"type": "json_object"}
+            )
+            
+            content = response.choices[0].message.content
+             # Handle potential markdown fencing
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0]
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0]
+
+            result = json.loads(content)
             return result
-        except:
+        except Exception as e:
+            print(f"LLM Error: {e}")
             return {
                 "performance_issues": [],
                 "performance_score": 50
