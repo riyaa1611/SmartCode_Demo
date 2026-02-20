@@ -32,6 +32,9 @@ class Review(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     completed_at = Column(DateTime(timezone=True), nullable=True)
     summary = Column(Text, nullable=True)
+    confidence_score = Column(Float, nullable=True)  # 0-100 PR confidence
+    verdict = Column(String, nullable=True)  # APPROVE / REVIEW_NEEDED / CHANGES_REQUESTED
+    score_breakdown = Column(JSONType, nullable=True)  # 5-dimension breakdown
     share_token = Column(String, nullable=True, index=True)
     share_password = Column(String, nullable=True)
     share_expires_at = Column(DateTime(timezone=True), nullable=True)
@@ -42,14 +45,17 @@ class Finding(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     review_id = Column(Integer, ForeignKey('reviews.id'), index=True)
-    category = Column(String)  # feature_drift, incomplete, performance, security
-    severity = Column(String)  # critical, high, medium, low
+    category = Column(String)  # requirement_drift, security, performance, code_quality, test_gap
+    severity = Column(String)  # critical, high, medium, low, info
+    title = Column(String, nullable=True)  # Short finding title
     description = Column(Text)
     file_path = Column(String)
     line_number = Column(Integer)
     confidence_score = Column(Float)
     code_snippet = Column(Text, nullable=True)
     suggestion = Column(Text, nullable=True)
+    suggested_fix = Column(Text, nullable=True)  # Actionable code fix
+    references = Column(JSONType, nullable=True)  # CWE/OWASP/doc links
 
 
 class ContextCache(Base):

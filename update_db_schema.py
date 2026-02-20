@@ -1,39 +1,50 @@
+"""Update the database schema to add new columns for SmartCode v2.
+
+Run this script to add:
+  - Review: confidence_score, verdict, score_breakdown
+  - Finding: title, suggested_fix, references
+"""
 import sqlite3
 import os
 
-# Database file path
-db_file = 'dev.db'
+DB_PATH = os.getenv("DEV_DB_PATH", os.path.join(os.path.dirname(__file__), "dev.db"))
 
-if not os.path.exists(db_file):
-    print("No database file found. Initializing new one via main app startup is recommended if this is a fresh install.")
-    # If no DB exists, models.py will create tables with new schema automatically on startup.
-    exit(0)
 
-print(f"Updating database: {db_file}")
+def migrate():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
 
-conn = sqlite3.connect(db_file)
-cursor = conn.cursor()
+    # ── Review table additions ──
+    review_columns = {
+        "confidence_score": "REAL",
+        "verdict": "VARCHAR",
+        "score_breakdown": "TEXT",  # JSON stored as text in SQLite
+    }
+    for col, dtype in review_columns.items():
+        try:
+            cursor.execute(f"ALTER TABLE reviews ADD COLUMN {col} {dtype}")
+            print(f"  ✓ Added reviews.{col}")
+        except sqlite3.OperationalError:
+            print(f"  – reviews.{col} already exists")
 
-def add_column_if_not_exists(table, column, type_def):
-    try:
-        cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {type_def}")
-        print(f"Added column {column} to {table}")
-    except sqlite3.OperationalError as e:
-        if "duplicate column" in str(e):
-            print(f"Column {column} already exists in {table}")
-        else:
-            print(f"Error adding {column} to {table}: {e}")
+    # ── Finding table additions ──
+    finding_columns = {
+        "title": "VARCHAR",
+        "suggested_fix": "TEXT",
+        "references": "TEXT",  # JSON stored as text in SQLite
+    }
+    for col, dtype in finding_columns.items():
+        try:
+            cursor.execute(f"ALTER TABLE findings ADD COLUMN {col} {dtype}")
+            print(f"  ✓ Added findings.{col}")
+        except sqlite3.OperationalError:
+            print(f"  – findings.{col} already exists")
 
-# Update reviews table
-add_column_if_not_exists('reviews', 'summary', 'TEXT')
-add_column_if_not_exists('reviews', 'share_token', 'TEXT')
-add_column_if_not_exists('reviews', 'share_password', 'TEXT')
-add_column_if_not_exists('reviews', 'share_expires_at', 'TIMESTAMP')
+    conn.commit()
+    conn.close()
+    print("\nSchema migration complete.")
 
-# Update findings table
-add_column_if_not_exists('findings', 'code_snippet', 'TEXT')
-add_column_if_not_exists('findings', 'suggestion', 'TEXT')
 
-conn.commit()
-conn.close()
-print("Database schema update completed.")
+if __name__ == "__main__":
+    print(f"Migrating database: {DB_PATH}\n")
+    migrate()

@@ -46,51 +46,6 @@ async def health_check():
     return {"status": "healthy", "service": "smart-code-review-bot"}
 
 
-@app.get("/demo/review/{pr_id}")
-async def demo_review(pr_id: int):
-    """Top-level demo endpoint returning a sample review JSON for quick UI testing."""
-    sample = {
-        "review": {
-            "id": pr_id,
-            "repo_name": "example/repo",
-            "pr_number": 123,
-            "pr_url": "https://github.com/example/repo/pull/123",
-            "status": "completed",
-            "created_at": "2025-11-24T00:00:00Z",
-
-            "completed_at": "2025-11-24T00:05:00Z",
-            "summary": "This is a demo review summary.",
-            "share_token": None,
-            "share_password": None,
-            "share_expires_at": None
-        },
-        "findings": [
-            {
-                "id": 1,
-                "category": "feature_drift",
-                "severity": "medium",
-                "description": "Feature implementation missing for requirement X",
-                "file_path": "src/module.py",
-                "line_number": 42,
-                "confidence_score": 0.86,
-                "code_snippet": "def feature_x():\n    pass",
-                "suggestion": "Implement the feature logic here."
-            },
-            {
-                "id": 2,
-                "category": "security",
-                "severity": "high",
-                "description": "Potential SQL injection vulnerability",
-                "file_path": "src/db.py",
-                "line_number": 88,
-                "confidence_score": 0.93,
-                "code_snippet": "query = 'SELECT * FROM users WHERE name = ' + user_input",
-                "suggestion": "Use parameterized queries to prevent SQL injection."
-            }
-        ]
-    }
-    return sample
-
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     return FileResponse("static/favicon.svg")
