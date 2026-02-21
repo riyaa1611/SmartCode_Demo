@@ -1,8 +1,16 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request, Header, BackgroundTasks
 from sqlalchemy.orm import Session
 from database import get_db
 from models import Review, Finding
 from typing import List
+from config import settings
+import os
+import hmac
+import hashlib
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -249,3 +257,62 @@ async def demo_review(pr_id: int):
         ],
     }
     return sample
+
+
+@router.post("/github/webhook")
+async def github_webhook(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    x_github_event: str = Header(None),
+    x_github_delivery: str = Header(None),
+    x_hub_signature_256: str = Header(None),
+):
+    """
+    Production-ready GitHub webhook handler.
+    Receives events from a GitHub App, verifies the signature securely,
+    logs structural information, and responds quickly to avoid timeouts.
+    """
+    payload_body = await request.body()
+    
+    # CRITICAL FIX for Windows: os.getenv often includes trailing \r or spaces
+    secret = settings.github_webhook_secret.strip() if settings.github_webhook_secret else None
+
+    # 1. Verify Signature
+    if not secret:
+        print("Warning: GITHUB_WEBHOOK_SECRET is not set in environment.")
+        raise HTTPException(status_code=500, detail="Webhook secret not configured")
+        
+    if not x_hub_signature_256:
+        print("[Webhook Error] Missing X-Hub-Signature-256 header")
+        raise HTTPException(status_code=401, detail="Missing X-Hub-Signature-256 header")
+        
+    # Calculate expected HMAC SHA256 signature
+    hash_object = hmac.new(secret.encode('utf-8'), msg=payload_body, digestmod=hashlib.sha256)
+    expected_signature = "sha256=" + hash_object.hexdigest()
+    
+    # Compare securely to prevent timing attacks
+    if not hmac.compare_digest(expected_signature, x_hub_signature_256):
+        print(f"[Webhook Error] Invalid signature.")
+        print(f"  Expected: {expected_signature}")
+        print(f"  Received: {x_hub_signature_256}")
+        raise HTTPException(status_code=401, detail="Invalid signature")
+
+    # 2. Parse JSON payload
+    try:
+        payload = json.loads(payload_body.decode("utf-8"))
+    except json.JSONDecodeError:
+        print("[Webhook Error] Invalid JSON payload")
+        raise HTTPException(status_code=400, detail="Invalid JSON payload")
+
+    # Extract repository name if available
+    repo_name = payload.get("repository", {}).get("full_name", "unknown_repo")
+
+    # 3. Structured Logging
+    print(f"[Webhook Received] Event: {x_github_event} | Delivery ID: {x_github_delivery} | Repo: {repo_name}")
+
+    # 4. Offload heavy processing to background tasks
+    # (Example: trigger analysis, process comments, etc.)
+    # background_tasks.add_task(process_webhook_event, x_github_event, payload)
+
+    # 5. Fast acknowledgment
+    return {"status": "ok", "message": "Webhook received successfully"}
